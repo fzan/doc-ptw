@@ -1,5 +1,5 @@
 (async function () {
-
+    debugger
     const port = window.CONFIG && window.CONFIG.API.port ? `:${window.CONFIG.API.port}` : ""
     const serverUrl = window.DOCAPI
     const version = window.CONFIG && window.CONFIG.API.version ? window.CONFIG.API.version : "v1"
@@ -94,4 +94,4 @@
         startNotificationCheck();
     };
 
-});
+})();
