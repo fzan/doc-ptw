@@ -36,7 +36,7 @@
     // Funzione per richiamare l'API e aggiornare il badge delle notifiche
     async function checkNotifications() {
         try {
-            const notificationsResponse = await fetch(`${baseurl}/api/v1/FileNotifications/Unsent?q=1&filter=notificationType`, {
+            const notificationsResponse = await fetch(`${baseurl}/FileNotifications/Unsent?q=1&filter=notificationType`, {
                 method: 'GET',
                 credentials: 'include', // Include i cookie della sessione autenticata
                 headers: new Headers({ 'Content-Type': 'application/json' }),
