@@ -1,9 +1,9 @@
 (async function () {
-    debugger
-    const port = window.CONFIG && window.CONFIG.API.port ? `:${window.CONFIG.API.port}` : ""
-    const serverUrl = window.DOCAPI
-    const version = window.CONFIG && window.CONFIG.API.version ? window.CONFIG.API.version : "v1"
-    const baseurl = `${serverUrl}/api/${version}`
+    debugger;
+    const port = window.CONFIG && window.CONFIG.API.port ? `:${window.CONFIG.API.port}` : "";
+    const serverUrl = window.DOCAPI;
+    const version = window.CONFIG && window.CONFIG.API.version ? window.CONFIG.API.version : "v1";
+    const baseurl = `${serverUrl}/api/${version}`;
 
     const urlAddress = window.TYPE === 'PTW' ? `${baseurl}/Login/Planet-Time-Web` : `TODO`;
 
@@ -13,6 +13,8 @@
         sessionId: window.SESSION_ID,
         rememberMe: true
     };
+
+    let previousNotificationCount = 0; // Variabile per salvare il numero di notifiche precedenti
 
     try {
         // Effettua il login
@@ -27,8 +29,11 @@
             throw new Error("Login failed");
         }
 
-        // Una volta autenticati, richiama l'API delle notifiche
-        await checkNotifications();
+        // Una volta autenticati, esegui il primo controllo delle notifiche
+        console.log("Login successful. Starting first notification check...");
+
+        // Avvia il ciclo di controllo periodico solo dopo il primo controllo
+        startNotificationCheck();
     } catch (error) {
         console.error("Error:", error);
     }
@@ -44,7 +49,16 @@
 
             if (notificationsResponse.ok) {
                 const notifications = await notificationsResponse.json();
-                updateNotificationBadge(notifications.length);
+                const currentNotificationCount = notifications.length;
+
+                // Controlla se ci sono nuove notifiche
+                if (currentNotificationCount > previousNotificationCount) {
+                    console.log("New notifications received:", currentNotificationCount - previousNotificationCount);
+                }
+
+                // Aggiorna il numero precedente e il badge
+                previousNotificationCount = currentNotificationCount;
+                updateNotificationBadge(currentNotificationCount);
             } else {
                 console.error("Failed to fetch notifications:", notificationsResponse.statusText);
                 updateNotificationBadge(0);
@@ -58,40 +72,33 @@
     // Funzione per aggiornare il badge
     function updateNotificationBadge(count) {
         const badge = document.getElementById('notifiche_doc');
-
         badge.textContent = count;
-
     }
 
     let notificationCheckInterval = null;
 
-    window.onload = function () {
-        // Avvia la funzione di notifica al caricamento della pagina
-        function startNotificationCheck() {
-            // Verifica se il controllo delle notifiche è già in esecuzione
-            if (notificationCheckInterval !== null) {
-                console.warn("Notification check is already running.");
-                return;
-            }
-
-            console.log("Starting notification check...");
-            async function checkNotificationsPeriodically() {
-                try {
-                    await checkNotifications();
-                } catch (error) {
-                    console.error("Error during notification check:", error);
-                    return; // Esci se si verifica un errore
-                }
-
-                // Pianifica il prossimo controllo solo se non ci sono stati errori
-                notificationCheckInterval = setTimeout(checkNotificationsPeriodically, 10000);
-            }
-
-            // Avvia il primo controllo
-            checkNotificationsPeriodically();
+    // Funzione per avviare il controllo periodico delle notifiche
+    function startNotificationCheck() {
+        // Verifica se il controllo delle notifiche è già in esecuzione
+        if (notificationCheckInterval !== null) {
+            console.warn("Notification check is already running.");
+            return;
         }
 
-        startNotificationCheck();
-    };
+        console.log("Starting periodic notification check...");
+        async function checkNotificationsPeriodically() {
+            try {
+                await checkNotifications();
+            } catch (error) {
+                console.error("Error during notification check:", error);
+                return; // Esci se si verifica un errore
+            }
 
+            // Pianifica il prossimo controllo solo se non ci sono stati errori
+            notificationCheckInterval = setTimeout(checkNotificationsPeriodically, 10000);
+        }
+
+        // Avvia il primo ciclo periodico
+        checkNotificationsPeriodically();
+    }
 })();
