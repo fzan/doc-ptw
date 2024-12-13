@@ -1,5 +1,4 @@
 (async function () {
-    debugger;
     const port = window.CONFIG && window.CONFIG.API.port ? `:${window.CONFIG.API.port}` : "";
     const serverUrl = window.DOCAPI;
     const version = window.CONFIG && window.CONFIG.API.version ? window.CONFIG.API.version : "v1";
@@ -15,6 +14,9 @@
     };
 
     let previousNotificationCount = 0; // Variabile per salvare il numero di notifiche precedenti
+
+    // Dichiarare notificationCheckInterval all'inizio del blocco
+    let notificationCheckInterval = null;
 
     try {
         // Effettua il login
@@ -74,8 +76,6 @@
         const badge = document.getElementById('notifiche_doc');
         badge.textContent = count;
     }
-
-    let notificationCheckInterval = null;
 
     // Funzione per avviare il controllo periodico delle notifiche
     function startNotificationCheck() {
