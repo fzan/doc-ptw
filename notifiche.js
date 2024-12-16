@@ -85,7 +85,7 @@
             return;
         }
 
-        console.log("Starting periodic notification check...");
+        //console.log("Starting periodic notification check...");
         async function checkNotificationsPeriodically() {
             try {
                 await checkNotifications();
@@ -101,4 +101,4 @@
         // Avvia il primo ciclo periodico
         checkNotificationsPeriodically();
     }
-})();
+})()
